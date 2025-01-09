@@ -59,3 +59,31 @@ cd your-repo
 pip install -r requirements.txt
 streamlit run your_app.py
 ```
+
+To ensure that the Streamlit app is accessible from any IP address, you should bind the Streamlit server to `0.0.0.0`. This allows the app to be accessed from outside the container.
+
+Here's how you can do it:
+
+1. **Run the container with the updated command:**
+   ```sh
+   docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 -p 8501:8501 --name ollama ollama/ollama
+   ```
+
+2. **Enter the container:**
+   ```sh
+   docker exec -it ollama /bin/bash
+   ```
+
+3. **Clone the GitHub repository and install dependencies:**
+   ```sh
+   git clone https://github.com/yourusername/your-repo.git
+   cd your-repo
+   pip install -r requirements.txt
+   ```
+
+4. **Run the Streamlit app with the `--server.address` option:**
+   ```sh
+   streamlit run your_app.py --server.address 0.0.0.0
+   ```
+
+By binding the Streamlit server to `0.0.0.0`, you ensure that it listens on all network interfaces, making it accessible from your host machine at `http://localhost:8501`.

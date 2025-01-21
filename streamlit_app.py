@@ -2,6 +2,7 @@ import streamlit as st
 import ollama
 import boto3
 import json
+import re
 
 # Set up the page
 st.set_page_config(page_title="LLM Chat App", initial_sidebar_state="expanded")
@@ -10,7 +11,7 @@ st.title("LLM Chat App")
 # Sidebar for model selection
 with st.sidebar:
     st.markdown("# Chat Options")
-    model = st.selectbox('What model would you like to use?', ['llama3.2', 'phi4', 'aws-nova-micro'])
+    model = st.selectbox('What model would you like to use?', ['llama3.2', 'phi4', 'deepseek-r1:14b', 'aws-nova-micro'])
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -48,7 +49,7 @@ if user_prompt:
 
     # Generate response from LLM
     with st.spinner('Generating response...'):
-        if model in ['llama3.2', 'phi4']:
+        if model in ['llama3.2', 'phi4', 'deepseek-r1:14b']:
             response = ollama.chat(model=model, messages=[{"role": "user", "content": full_prompt}])
             response_content = response['message']['content']
         elif model == 'aws-nova-micro':
@@ -61,7 +62,13 @@ if user_prompt:
                 messages=messages
             )
             response_content = model_response["output"]["message"]["content"][0]["text"]
-
+    
+    # Use regex to remove content inside <think> tags
+    def remove_thinking_tags(text):
+        cleaned_text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL)
+        return cleaned_text.strip()
+    if '<think>' in response_content:
+        response_content = remove_thinking_tags(response_content)
     # Display response in chat message widget
     with st.chat_message("assistant"):
         st.markdown(response_content)

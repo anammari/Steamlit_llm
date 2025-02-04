@@ -11,7 +11,7 @@ st.title("LLM Chat App")
 # Sidebar for model selection
 with st.sidebar:
     st.markdown("# Chat Options")
-    model = st.selectbox('What model would you like to use?', ['llama3.2', 'phi4', 'deepseek-r1:14b', 'aws-nova-micro'])
+    model = st.selectbox('What model would you like to use?', ['llama3.2:3b', 'phi4', 'deepseek-r1:14b', 'aws-nova-micro'])
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -49,7 +49,7 @@ if user_prompt:
 
     # Generate response from LLM
     with st.spinner('Generating response...'):
-        if model in ['llama3.2', 'phi4', 'deepseek-r1:14b']:
+        if model in ['llama3.2:3b', 'phi4', 'deepseek-r1:14b']:
             response = ollama.chat(model=model, messages=[{"role": "user", "content": full_prompt}])
             response_content = response['message']['content']
         elif model == 'aws-nova-micro':
